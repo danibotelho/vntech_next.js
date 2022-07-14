@@ -1,34 +1,15 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
-import {
-  Table,
-  Thead,
-  Tbody,
-  Tfoot,
-  Tr,
-  Th,
-  Td,
-  TableCaption,
-  TableContainer,
-  Box,
-  Heading,
-  Button,
-} from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { api } from "../services/api";
 import FinancesTable from "../components/FinancesTable";
 import NewExpenseModal from "../components/NewExpenseModal";
-
-interface IExpenses{
-  id: number;
-  date: number;
-  description: string;
-  category: string;
-  value: number
-}
+import { useState } from "react";
+import { Heading, useDisclosure } from "@chakra-ui/react";
 
 const Home: NextPage = () => {
+  
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   return (
     <div className={styles.container}>
       <Head>
@@ -41,10 +22,14 @@ const Home: NextPage = () => {
         <Heading as="h2" mb="100px">
           My Finances
         </Heading>
-        <FinancesTable />
-        <NewExpenseModal 
-          isOpen={true}
-          onClose={() => true}/>
+        <FinancesTable
+          onAddExpense={onOpen}
+        />
+       
+        <NewExpenseModal
+          isOpen={isOpen}
+          onClose={onClose}
+        />
       </main>
 
       <footer className={styles.footer}>
