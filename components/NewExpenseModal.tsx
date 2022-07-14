@@ -43,6 +43,12 @@ function NewExpenseModal({ isOpen, onSave, onClose }: Props) {
   }, []);
 
   const handleAddExpense = () => {
+    const expense = {
+      description: description, //um forma de fazer objectShortHand
+      value, //outra forma de fazer
+      category,
+    }
+    console.log({expense});
     onClose();
   };
 
@@ -87,7 +93,9 @@ function NewExpenseModal({ isOpen, onSave, onClose }: Props) {
                 <FormLabel htmlFor="category">Categoria</FormLabel>
                 <Select 
                 id="category" 
-                placeholder="Categoria">
+                placeholder="Categoria"
+                onChange={(e) => setCategory(e.target.value)}>
+                 
                 {categories?.map(category => (
                   <option key={category} value={category}>
                   {category}  
