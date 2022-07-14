@@ -18,6 +18,7 @@ import {
 import { useEffect, useState } from "react";
 import { api } from "../services/api";
 import FinancesTable from "../components/FinancesTable";
+import NewExpenseModal from "../components/NewExpenseModal";
 
 interface IExpenses{
   id: number;
@@ -41,6 +42,9 @@ const Home: NextPage = () => {
           My Finances
         </Heading>
         <FinancesTable />
+        <NewExpenseModal 
+          isOpen={true}
+          onClose={() => true}/>
       </main>
 
       <footer className={styles.footer}>
