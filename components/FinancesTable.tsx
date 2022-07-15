@@ -12,15 +12,7 @@ import {
   Heading,
 } from "@chakra-ui/react";
 import { api } from "../services/api";
-
-export interface IExpenses {
-  id: number;
-  date: number;
-  description: string;
-  category: string;
-  value: number;
-}
-
+import { IExpenses } from "../models/IExpense";
 interface Props {
   onAddExpense: () => void;
 }
