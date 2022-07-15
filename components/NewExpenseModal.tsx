@@ -20,21 +20,19 @@ import {
   Select,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { IExpenses } from "../models/IExpense";
 import { getCategories, saveExpense } from "../services/api";
 
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  //onSave: (expense: IExpenses) => void;
+  onSave: () => void;
 }
 
-function NewExpenseModal({ isOpen, onClose }: Props) {
+function NewExpenseModal({ isOpen, onSave, onClose }: Props) {
   const [description, setDescription] = useState("");
   const [value, setValue] = useState(1);
   const [category, setCategory] = useState<string>();
-
   const [categories, setCategories] = useState<string[]>();
 
   useEffect(() => {
@@ -49,13 +47,15 @@ function NewExpenseModal({ isOpen, onClose }: Props) {
     }
 
     const expense = {
-      description: description, //um forma de fazer objectShortHand
-      value, //outra forma de fazer
-      category,
       date: Date.now(),
+      description: description, //um forma de fazer objectShortHand
+      category,//outra forma de fazer
+      value, 
+      
+      
     }
    await saveExpense(expense)
-    onClose();
+    onSave();
   };
 
   return (

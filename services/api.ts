@@ -1,10 +1,14 @@
 import axios from 'axios'
 import ICategory from '../models/ICategory'
-import { SaveExpenseDto } from '../models/IExpense'
+import { IExpenses, SaveExpenseDto } from '../models/IExpense'
 
 export const api = axios.create({
     baseURL:'http://localhost:3333'
 })
+export const getExpenses =  async () =>{
+    const response = await api.get<IExpenses[]>('/expenses')
+    return response.data
+}
 
 export const getCategories = async () => {
     const response = await api.get<ICategory[]>('/categories')

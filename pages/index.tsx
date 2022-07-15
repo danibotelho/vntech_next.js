@@ -3,12 +3,22 @@ import Head from "next/head";
 import styles from "../styles/Home.module.css";
 import FinancesTable from "../components/FinancesTable";
 import NewExpenseModal from "../components/NewExpenseModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Heading, useDisclosure } from "@chakra-ui/react";
+import { IExpenses } from "../models/IExpense";
+import { getExpenses } from "../services/api";
 
 const Home: NextPage = () => {
-  
+  const [expenses, setExpenses] = useState<IExpenses[]>([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const fetchExpenses = () => {
+    getExpenses().then((expenseList) => setExpenses(expenseList));
+  };
+
+  useEffect(() => {
+    fetchExpenses();
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -22,12 +32,13 @@ const Home: NextPage = () => {
         <Heading as="h2" mb="100px">
           My Finances
         </Heading>
-        <FinancesTable
-          onAddExpense={onOpen}
-        />
-       
+        <FinancesTable expenses={expenses} onAddExpense={onOpen} />
         <NewExpenseModal
           isOpen={isOpen}
+          onSave={() => {
+            fetchExpenses();
+            onClose();
+          }}
           onClose={onClose}
         />
       </main>

@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   Table,
   Thead,
@@ -11,24 +10,27 @@ import {
   Button,
   Heading,
 } from "@chakra-ui/react";
-import { api } from "../services/api";
 import { IExpenses } from "../models/IExpense";
 interface Props {
+  expenses: IExpenses[];
   onAddExpense: () => void;
 }
 
-const FinancesTable = ({ onAddExpense }: Props) => {
-  const [expenses, setExpenses] = useState<IExpenses[]>([]);
-
-  useEffect(() => {
-    api.get("/expenses").then((response) => setExpenses(response.data));
-  }, []);
-
+const FinancesTable = ({ expenses, onAddExpense }: Props) => {
   const toBRL = (value: number) =>
     value.toLocaleString("pt-BR", {
       currency: "BRL",
       style: "currency",
     });
+
+  const total = expenses.reduce((acc, cur) => {
+    return acc + cur.value;
+  }, 0);
+
+  // let total = 0
+  // for (const element of expenses) {
+  //   total += element.value
+  // }
 
   return (
     <>
@@ -40,7 +42,7 @@ const FinancesTable = ({ onAddExpense }: Props) => {
       >
         <Heading size="lg">
           {/* Total: {toBRL(expenses?.reduce((acc, curr) => acc + curr.value, 0))} */}
-          Total: R$ 999,99
+          Total: {toBRL(total)}
         </Heading>
         <Button
           bg="green.400"
@@ -75,7 +77,8 @@ const FinancesTable = ({ onAddExpense }: Props) => {
               {expenses.map((expense) => (
                 <Tr key={expense.id}>
                   <Td isNumeric>{expense.id}</Td>
-                  <Td>{new Date(expense.date).toLocaleDateString("pt-BR")}</Td>
+                  <Td>{new Date(expense.date).toLocaleDateString("pt-BR")}
+                  </Td>
                   <Td>{expense.description}</Td>
                   <Td>{expense.category}</Td>
                   <Td>{toBRL(expense.value)}</Td>
