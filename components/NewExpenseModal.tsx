@@ -18,6 +18,7 @@ import {
   NumberInputField,
   NumberInputStepper,
   Select,
+  useToast,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { getCategories, saveExpense } from "../services/api";
@@ -32,8 +33,10 @@ interface Props {
 function NewExpenseModal({ isOpen, onSave, onClose }: Props) {
   const [description, setDescription] = useState("");
   const [value, setValue] = useState(1);
+  const [isLoding, setIsLoding] = useState(false)
   const [category, setCategory] = useState<string>();
   const [categories, setCategories] = useState<string[]>();
+  const toast = useToast()
 
   useEffect(() => {
     getCategories().then((categories) =>
@@ -45,16 +48,22 @@ function NewExpenseModal({ isOpen, onSave, onClose }: Props) {
     if(!category){
       return;
     }
-
     const expense = {
       date: Date.now(),
       description: description, //um forma de fazer objectShortHand
       category,//outra forma de fazer
-      value, 
-      
-      
+      value,      
     }
+    setIsLoding(true)
+
    await saveExpense(expense)
+
+    setIsLoding(false)
+   
+    toast({
+    title: 'Despesa Salva',
+    status: 'success',
+  })
     onSave();
   };
 
@@ -116,7 +125,10 @@ function NewExpenseModal({ isOpen, onSave, onClose }: Props) {
           <Button onClick={() => onClose()} mr={3}>
             Cancelar
           </Button>
-          <Button colorScheme="green" onClick={handleAddExpense}>
+          <Button 
+          colorScheme="green" 
+          onClick={handleAddExpense}
+          disabled={isLoding}>
             Adicionar
           </Button>
         </ModalFooter>
