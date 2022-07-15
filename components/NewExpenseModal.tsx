@@ -21,49 +21,57 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import { IExpenses } from "../models/IExpense";
 import { getCategories, saveExpense } from "../services/api";
-
 
 interface Props {
   isOpen: boolean;
+  expense?: IExpenses;
   onClose: () => void;
   onSave: () => void;
 }
 
-function NewExpenseModal({ isOpen, onSave, onClose }: Props) {
+function NewExpenseModal({ isOpen, expense, onSave, onClose }: Props) {
   const [description, setDescription] = useState("");
-  const [value, setValue] = useState(1);
-  const [isLoding, setIsLoding] = useState(false)
+  const [value, setValue] = useState(0.00);
+  const [isLoding, setIsLoding] = useState(false);
   const [category, setCategory] = useState<string>();
   const [categories, setCategories] = useState<string[]>();
-  const toast = useToast()
+  const toast = useToast();
+
+  useEffect(() => {
+    setDescription(expense?.description ?? "");
+    setValue(expense?.value ?? 1);
+    setCategory(expense?.category);
+  }, [expense]);
 
   useEffect(() => {
     getCategories().then((categories) =>
-      setCategories(categories.map(category => category.name))
+      setCategories(categories.map((category) => category.name))
     );
   }, []);
 
   const handleAddExpense = async () => {
-    if(!category){
+    if (!category) {
       return;
     }
-    const expense = {
+    const expenseToSave = {
+      id: expense?.id,
       date: Date.now(),
       description: description, //um forma de fazer objectShortHand
-      category,//outra forma de fazer
-      value,      
-    }
-    setIsLoding(true)
+      category, //outra forma de fazer
+      value,
+    };
+    setIsLoding(true);
 
-   await saveExpense(expense)
+    await saveExpense(expenseToSave);
 
-    setIsLoding(false)
-   
+    setIsLoding(false);
+
     toast({
-    title: 'Despesa Salva',
-    status: 'success',
-  })
+      title: "Despesa Salva",
+      status: "success",
+    });
     onSave();
   };
 
@@ -93,7 +101,11 @@ function NewExpenseModal({ isOpen, onSave, onClose }: Props) {
             <GridItem colSpan={1}>
               <FormControl>
                 <FormLabel htmlFor="value">Valor</FormLabel>
-                <NumberInput min={1} onChange={(_, value) => setValue(value)}>
+                <NumberInput 
+                min={0.00}
+                step={0.1}                 
+                value={value}
+                onChange={(_, value) => setValue(value)}>
                   <NumberInputField id="value" />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
@@ -106,16 +118,17 @@ function NewExpenseModal({ isOpen, onSave, onClose }: Props) {
             <GridItem colSpan={1}>
               <FormControl>
                 <FormLabel htmlFor="category">Categoria</FormLabel>
-                <Select 
-                id="category" 
-                placeholder="Categoria"
-                onChange={(e) => setCategory(e.target.value)}>
-                 
-                {categories?.map(category => (
-                  <option key={category} value={category}>
-                  {category}  
-                  </option>
-                ))}  
+                <Select
+                  id="category"
+                  placeholder="Categoria"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                >
+                  {categories?.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
                 </Select>
               </FormControl>
             </GridItem>
@@ -125,11 +138,12 @@ function NewExpenseModal({ isOpen, onSave, onClose }: Props) {
           <Button onClick={() => onClose()} mr={3}>
             Cancelar
           </Button>
-          <Button 
-          colorScheme="green" 
-          onClick={handleAddExpense}
-          disabled={isLoding}>
-            Adicionar
+          <Button
+            colorScheme="green"
+            onClick={handleAddExpense}
+            disabled={isLoding}
+          >
+           {expense ? "Editar" : "Adicionar"}
           </Button>
         </ModalFooter>
       </ModalContent>

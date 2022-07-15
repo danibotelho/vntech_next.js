@@ -4,13 +4,15 @@ import styles from "../styles/Home.module.css";
 import FinancesTable from "../components/FinancesTable";
 import NewExpenseModal from "../components/NewExpenseModal";
 import { useEffect, useState } from "react";
-import { Heading, useDisclosure } from "@chakra-ui/react";
+import { Heading, useDisclosure, useToast } from "@chakra-ui/react";
 import { IExpenses } from "../models/IExpense";
-import { getExpenses } from "../services/api";
+import { getExpenses, removeExpense } from "../services/api";
 
 const Home: NextPage = () => {
   const [expenses, setExpenses] = useState<IExpenses[]>([]);
+  const [expenseToEdit, setExpenseToEdit] = useState<IExpenses>();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
 
   const fetchExpenses = () => {
     getExpenses().then((expenseList) => setExpenses(expenseList));
@@ -32,14 +34,35 @@ const Home: NextPage = () => {
         <Heading as="h2" mb="100px">
           My Finances
         </Heading>
-        <FinancesTable expenses={expenses} onAddExpense={onOpen} />
+        <FinancesTable
+          expenses={expenses}
+          onAddExpense={() => onOpen()}
+          onEditExpense={(expense) => {
+            setExpenseToEdit(expense);
+            onOpen();
+          }}
+          onRemoveExpense={async (expense) => {
+           await removeExpense(expense)
+           fetchExpenses();
+           toast({
+            title: "Despesa Removida",
+            status: "info",
+          });
+          }}
+        />
         <NewExpenseModal
           isOpen={isOpen}
+          expense={expenseToEdit}
           onSave={() => {
             fetchExpenses();
             onClose();
+            setExpenseToEdit(undefined)
           }}
-          onClose={onClose}
+          onClose={()=>{
+            onClose()
+            setExpenseToEdit(undefined)
+
+          }}
         />
       </main>
 
@@ -57,3 +80,7 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+function toast(arg0: { title: string; status: string; }) {
+  throw new Error("Function not implemented.");
+}
+
